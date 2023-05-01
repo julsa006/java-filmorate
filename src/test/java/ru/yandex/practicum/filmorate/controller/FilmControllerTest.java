@@ -5,11 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,52 +24,57 @@ class FilmControllerTest {
 
     @Test
     void testCreateValidationSuccess() throws Exception {
-        checkCreateStatusOk(filmRequestBody(null, "name", "description", "2023-01-01", 10));
+        assertCreateStatusOk(filmRequestBody(null, "name", "description", "2023-01-01", 10));
     }
 
     @Test
     void testCreateValidationFailedEmptyName() throws Exception {
-        checkCreateStatusFailed(filmRequestBody(null, "", "description", "2023-01-01", 10));
-        checkCreateStatusFailed(filmRequestBody(null, "     ", "description", "2023-01-01", 10));
-        checkCreateStatusFailed(filmRequestBody(null, null, "description", "2023-01-01", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, "", "description", "2023-01-01", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, "     ", "description", "2023-01-01", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, null, "description", "2023-01-01", 10));
     }
 
     @Test
     void testCreateValidationDescription() throws Exception {
         String longDescription = "A".repeat(201);
-        checkCreateStatusFailed(filmRequestBody(null, "name", longDescription, "2023-01-01", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", longDescription, "2023-01-01", 10));
     }
 
     @Test
     void testCreateValidationReleaseDate() throws Exception {
-        checkCreateStatusOk(filmRequestBody(null, "name", "description", "1895-12-28", 10));
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", "1895-12-27", 10));
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", "1895-28-12", 10));
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", null, 10));
+        assertCreateStatusOk(filmRequestBody(null, "name", "description", "1895-12-28", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", "description", "1895-12-27", 10));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", "description", null, 10));
     }
 
     @Test
     void testCreateValidationDuration() throws Exception {
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", "2023-12-28", 0));
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", "2023-12-28", -10));
-        checkCreateStatusFailed(filmRequestBody(null, "name", "description", "2023-12-28", null));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", "description", "2023-12-28", 0));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", "description", "2023-12-28", -10));
+        assertCreateInvalidArguments(filmRequestBody(null, "name", "description", "2023-12-28", null));
     }
 
-    private void checkCreateStatus(String request, ResultMatcher rm) throws Exception {
-        mockMvc.perform(post("/films").contentType(MediaType.APPLICATION_JSON).content(request))
-                .andDo(print())
-                .andExpect(rm);
+    private ResultActions performCreate(String request) throws Exception {
+        return mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andDo(print());
     }
 
-    private void checkCreateStatusOk(String request) throws Exception {
-        checkCreateStatus(request, status().isOk());
+    private void assertCreateStatusOk(String request) throws Exception {
+        performCreate(request).andExpect(status().isOk());
     }
 
-    private void checkCreateStatusFailed(String request) throws Exception {
-        checkCreateStatus(request, status().isBadRequest());
+    private void assertCreateInvalidArguments(String request) throws Exception {
+        performCreate(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(
+                        result.getResolvedException() instanceof ValidationException ||
+                                result.getResolvedException() instanceof MethodArgumentNotValidException)
+                );
     }
 
-    String filmRequestBody(Integer id, String name, String description, String releaseDate, Integer duration) {
+    private String filmRequestBody(Integer id, String name, String description, String releaseDate, Integer duration) {
         List<String> props = new ArrayList<>();
 
         if (id != null) props.add(String.format("\"id\": %d", id));

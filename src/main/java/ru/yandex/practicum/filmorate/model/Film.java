@@ -27,6 +27,6 @@ public class Film {
 
     @NotNull
     @Positive(message
-            = "Duration must be no positive")
+            = "Duration must be positive")
     Integer duration;
 }
