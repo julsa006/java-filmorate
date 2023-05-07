@@ -22,7 +22,7 @@ public class InMemoryLikeStorage implements LikeStorage {
 
     @Override
     public void remove(Integer filmId, Integer userId) {
-        if ((!likes.containsKey(filmId)) || (!likes.get(filmId).contains(userId))) {
+        if (!likes.containsKey(filmId) || !likes.get(filmId).contains(userId)) {
             throw new NotFoundException("Like not found");
         }
         likes.get(filmId).remove(userId);

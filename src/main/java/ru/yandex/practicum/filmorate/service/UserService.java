@@ -1,35 +1,33 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
 
-
-    @Autowired
-    public UserService(UserStorage userStorage, FriendshipStorage friendshipStorage) {
-        this.userStorage = userStorage;
-        this.friendshipStorage = friendshipStorage;
-    }
-
     public User createUser(User user) {
+        validateUser(user, false);
+        user = user.toBuilder().name(getDefaultName(user)).build();
         return userStorage.create(user);
     }
 
     public void updateUser(User user) {
+        validateUser(user, true);
         checkUserExist(user.getId());
+        user = user.toBuilder().name(getDefaultName(user)).build();
         userStorage.update(user);
     }
 
@@ -38,7 +36,7 @@ public class UserService {
         return userStorage.get(userId);
     }
 
-    public Collection<User> getAllUsers() {
+    public List<User> getAllUsers() {
         return userStorage.findAll();
     }
 
@@ -55,14 +53,14 @@ public class UserService {
         friendshipStorage.remove(firstId, secondId);
     }
 
-    public Collection<User> getMutualFriends(Integer firstId, Integer secondId) {
+    public List<User> getMutualFriends(Integer firstId, Integer secondId) {
         checkUserExist(firstId);
         checkUserExist(secondId);
         Set<Integer> firstFriends = friendshipStorage.getFriends(firstId);
         Set<Integer> secondFriends = friendshipStorage.getFriends(secondId);
         List<User> mutual = new ArrayList<>();
 
-        if ((firstFriends == null) || (secondFriends == null)) {
+        if (firstFriends == null || secondFriends == null) {
             return mutual;
         }
 
@@ -74,7 +72,7 @@ public class UserService {
         return mutual;
     }
 
-    public Collection<User> getFriends(Integer id) {
+    public List<User> getFriends(Integer id) {
         checkUserExist(id);
         List<User> friends = new ArrayList<>();
         for (Integer friendId : friendshipStorage.getFriends(id)) {
@@ -87,5 +85,21 @@ public class UserService {
         if (!userStorage.contains(id)) {
             throw new NotFoundException(String.format("User %d not found", id));
         }
+    }
+
+    private void validateUser(User user, boolean requireId) {
+        if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Login cannot contain spaces");
+        }
+        if (requireId && user.getId() == null) {
+            throw new ValidationException("Id cannot be null");
+        }
+    }
+
+    private String getDefaultName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            return user.getLogin();
+        }
+        return user.getName();
     }
 }

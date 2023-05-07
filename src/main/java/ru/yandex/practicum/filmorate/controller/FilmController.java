@@ -1,38 +1,29 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
+@AllArgsConstructor
 public class FilmController {
 
-    private static final LocalDate MIN_RELEASE_DATE = LocalDate.of(1895, 12, 28);
     private final FilmService service;
 
-    @Autowired
-    public FilmController(FilmService service) {
-        this.service = service;
-    }
-
-
     @GetMapping
-    public Collection<Film> findAll() {
+    public List<Film> findAll() {
         return service.getAllFilms();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        validate(film, false);
         Film newFilm = service.createFilm(film);
         log.info("Film added: {}", newFilm);
         return newFilm;
@@ -40,7 +31,6 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
-        validate(film, true);
         service.updateFilm(film);
         log.info("Film updated: {}", film);
         return film;
@@ -64,18 +54,9 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopular(@RequestParam(defaultValue = "10") Integer count) {
+    public List<Film> getPopular(@RequestParam(defaultValue = "10") Integer count) {
         return service.getPopular(count);
     }
 
-
-    private void validate(Film film, boolean requireId) {
-        if (requireId && (film.getId() == null)) {
-            throw new ValidationException("Id cannot be null");
-        }
-        if (film.getReleaseDate().isBefore(MIN_RELEASE_DATE)) {
-            throw new ValidationException(String.format("Release date must be after %s", MIN_RELEASE_DATE));
-        }
-    }
 
 }
