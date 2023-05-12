@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -20,10 +19,8 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final LikeStorage likeStorage;
-    private final UserService userService;
 
     public Film getFilm(Integer id) {
-        checkFilmExist(id);
         return filmStorage.get(id);
     }
 
@@ -34,7 +31,6 @@ public class FilmService {
 
     public void updateFilm(Film film) {
         validateFilm(film, true);
-        checkFilmExist(film.getId());
         filmStorage.update(film);
     }
 
@@ -43,14 +39,10 @@ public class FilmService {
     }
 
     public void like(Integer filmId, Integer userId) {
-        checkFilmExist(filmId);
-        userService.checkUserExist(userId);
         likeStorage.add(filmId, userId);
     }
 
     public void removeLike(Integer filmId, Integer userId) {
-        checkFilmExist(filmId);
-        userService.checkUserExist(userId);
         likeStorage.remove(filmId, userId);
     }
 
@@ -59,12 +51,6 @@ public class FilmService {
                 .sorted(Comparator.comparing(f -> likeStorage.getNumberOfLikes(f.getId()), Comparator.reverseOrder()))
                 .limit(count)
                 .collect(Collectors.toList());
-    }
-
-    private void checkFilmExist(Integer id) {
-        if (!filmStorage.contains(id)) {
-            throw new NotFoundException(String.format("Film %d not found", id));
-        }
     }
 
     private void validateFilm(Film film, boolean requireId) {

@@ -12,6 +12,4 @@ public interface UserStorage {
     void update(User user);
 
     User get(Integer id);
-
-    boolean contains(Integer id);
 }

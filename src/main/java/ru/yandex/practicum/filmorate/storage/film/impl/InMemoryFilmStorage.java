@@ -1,9 +1,9 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.film.impl;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void update(Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User %s not found", film.getId()));
+            throw new NotFoundException(String.format("Film %s not found", film.getId()));
         }
         films.put(film.getId(), film);
     }
@@ -39,10 +39,5 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film get(Integer id) {
         return films.get(id);
-    }
-
-    @Override
-    public boolean contains(Integer id) {
-        return films.containsKey(id);
     }
 }

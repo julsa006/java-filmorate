@@ -1,6 +1,7 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.user.impl;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 
 import java.util.HashMap;
 import java.util.HashSet;

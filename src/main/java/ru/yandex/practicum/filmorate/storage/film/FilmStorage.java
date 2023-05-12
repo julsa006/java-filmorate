@@ -12,6 +12,4 @@ public interface FilmStorage {
     void update(Film film);
 
     Film get(Integer id);
-
-    boolean contains(Integer id);
 }
