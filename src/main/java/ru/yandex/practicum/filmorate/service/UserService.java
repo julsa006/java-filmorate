@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -47,28 +45,11 @@ public class UserService {
     }
 
     public List<User> getMutualFriends(Integer firstId, Integer secondId) {
-        Set<Integer> firstFriends = friendshipStorage.getFriends(firstId);
-        Set<Integer> secondFriends = friendshipStorage.getFriends(secondId);
-        List<User> mutual = new ArrayList<>();
-
-        if (firstFriends == null || secondFriends == null) {
-            return mutual;
-        }
-
-        for (Integer firstFriend : firstFriends) {
-            if (secondFriends.contains(firstFriend)) {
-                mutual.add(userStorage.get(firstFriend));
-            }
-        }
-        return mutual;
+        return userStorage.getMutualFriends(firstId, secondId);
     }
 
     public List<User> getFriends(Integer id) {
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId : friendshipStorage.getFriends(id)) {
-            friends.add(userStorage.get(friendId));
-        }
-        return friends;
+        return userStorage.getFriends(id);
     }
 
     private void validateUser(User user, boolean requireId) {

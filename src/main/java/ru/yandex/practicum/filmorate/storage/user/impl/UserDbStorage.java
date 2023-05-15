@@ -82,6 +82,41 @@ public class UserDbStorage implements UserStorage {
         return rsToUser(rs);
     }
 
+    @Override
+    public List<User> getFriends(Integer id) {
+        String sql = "SELECT * FROM users u JOIN users_relationships ur ON u.id = ur.following_id " +
+                "WHERE ur.follower_id = ? ORDER BY u.id";
+        List<User> result = new ArrayList<>();
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, id);
+        while (rs.next()) {
+            result.add(rsToUser(rs));
+        }
+        return result;
+    }
+
+    @Override
+    public List<User> getMutualFriends(Integer firstId, Integer secondId) {
+        String sql = "SELECT * " +
+                "FROM USERS u " +
+                "WHERE u.ID IN " +
+                "(SELECT ur.FOLLOWING_ID " +
+                "FROM USERS_RELATIONSHIPS ur " +
+                "WHERE ur.FOLLOWER_ID = ?) " +
+                "AND " +
+                "u.ID IN " +
+                "(SELECT ur.FOLLOWING_ID " +
+                "FROM USERS_RELATIONSHIPS ur " +
+                "WHERE ur.FOLLOWER_ID =?) " +
+                "ORDER BY u.id";
+
+        List<User> result = new ArrayList<>();
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, firstId, secondId);
+        while (rs.next()) {
+            result.add(rsToUser(rs));
+        }
+        return result;
+    }
+
     private User rsToUser(SqlRowSet row) {
         return new User(
                 row.getInt("id"),

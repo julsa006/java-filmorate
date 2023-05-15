@@ -23,12 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FilmStorageTest {
     private final FilmDbStorage filmDbStorage;
 
-    public static Film createFilm(int i) {
-        Film film = new Film(1, "film" + i, "description" + i,
-                LocalDate.of(1990, 12, 31).plusDays(i),
-                i, new ArrayList<>(), new MPA(1, "G"));
-        return film.toBuilder().id(null).build();
-    }
 
     @Test
     void createFilmTest() {
@@ -73,4 +67,12 @@ public class FilmStorageTest {
         films = filmDbStorage.findAll();
         assertThat(films).hasSize(2).contains(film1, film2);
     }
+
+    Film createFilm(int i) {
+        Film film = new Film(1, "film" + i, "description" + i,
+                LocalDate.of(1990, 12, 31).plusDays(i),
+                i, new ArrayList<>(), new MPA(1, "G"));
+        return film.toBuilder().id(null).build();
+    }
+
 }

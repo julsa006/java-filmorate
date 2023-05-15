@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,10 +45,7 @@ public class FilmService {
     }
 
     public List<Film> getPopular(int count) {
-        return filmStorage.findAll().stream()
-                .sorted(Comparator.comparing(f -> likeStorage.getNumberOfLikes(f.getId()), Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopular(count);
     }
 
     private void validateFilm(Film film, boolean requireId) {

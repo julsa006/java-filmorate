@@ -29,14 +29,4 @@ public class LikeDbStorage implements LikeStorage {
             throw new NotFoundException(String.format("No like found for film#%d user#%d", filmId, userId));
         }
     }
-
-    @Override
-    public int getNumberOfLikes(Integer filmId) {
-        String sql = "SELECT count(*) FROM likes WHERE film_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, filmId);
-        if (count == null) {
-            return 0;
-        }
-        return count;
-    }
 }

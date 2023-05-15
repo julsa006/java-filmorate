@@ -9,10 +9,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.impl.UserDbStorage;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -20,12 +20,6 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserStorageTest {
     private final UserDbStorage userStorage;
-
-    public static User createUser(int i) {
-        User user = new User(1, "email" + i + "@email.com", "login" + i, "name" + i,
-                LocalDate.of(1990, 12, 31).plusDays(i));
-        return user.toBuilder().id(null).build();
-    }
 
     @Test
     void createUserTest() {
@@ -69,5 +63,11 @@ public class UserStorageTest {
         user2 = userStorage.create(user2);
         users = userStorage.findAll();
         assertThat(users).hasSize(2).contains(user1, user2);
+    }
+
+    User createUser(int i) {
+        User user = new User(1, "email" + i + "@email.com", "login" + i, "name" + i,
+                LocalDate.of(1990, 12, 31).plusDays(i));
+        return user.toBuilder().id(null).build();
     }
 }

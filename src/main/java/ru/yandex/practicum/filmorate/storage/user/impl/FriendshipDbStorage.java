@@ -4,13 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Primary
 @Component
@@ -37,16 +34,5 @@ public class FriendshipDbStorage implements FriendshipStorage {
         if (rowCount == 0) {
             throw new NotFoundException(String.format("No friendship found for user#%d and user#%d", firstId, secondId));
         }
-    }
-
-    @Override
-    public Set<Integer> getFriends(Integer userId) {
-        String sql = "SELECT * FROM users_relationships WHERE follower_id = ?";
-        Set<Integer> friends = new HashSet<>();
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, userId);
-        while (rs.next()) {
-            friends.add(rs.getInt("following_id"));
-        }
-        return friends;
     }
 }

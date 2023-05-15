@@ -29,7 +29,6 @@ public class InMemoryLikeStorage implements LikeStorage {
         likes.get(filmId).remove(userId);
     }
 
-    @Override
     public int getNumberOfLikes(Integer filmId) {
         if (!likes.containsKey(filmId)) {
             return 0;

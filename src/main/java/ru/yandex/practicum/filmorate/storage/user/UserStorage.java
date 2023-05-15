@@ -12,4 +12,8 @@ public interface UserStorage {
     void update(User user);
 
     User get(Integer id);
+
+    List<User> getFriends(Integer id);
+
+    List<User> getMutualFriends(Integer firstId, Integer secondId);
 }

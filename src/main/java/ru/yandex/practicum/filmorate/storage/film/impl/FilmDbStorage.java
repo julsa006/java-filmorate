@@ -148,6 +148,42 @@ public class FilmDbStorage implements FilmStorage {
         return film.toBuilder().genres(genres).build();
     }
 
+    @Override
+    public List<Film> getPopular(int count) {
+        String sql = String.format("%s LEFT JOIN likes l ON f.id = l.film_id "
+                + "GROUP BY f.id ORDER BY count(l.user_id) DESC LIMIT ?", SELECT_FILMS);
+
+        List<Film> films = new ArrayList<>();
+
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, count);
+        while (rs.next()) {
+            films.add(rsToFilm(rs));
+        }
+
+        sql = "SELECT g.id genre_id, g.name genre_name, fg.film_id film_id FROM films_genres fg JOIN genres g ON fg.genre_id = g.id";
+        rs = jdbcTemplate.queryForRowSet(sql);
+        Map<Integer, List<Genre>> filmGenres = new HashMap<>();
+        while (rs.next()) {
+            int filmId = rs.getInt("FILM_ID");
+            Genre genre = new Genre(rs.getInt("GENRE_ID"), rs.getString("GENRE_NAME"));
+            if (!filmGenres.containsKey(filmId)) {
+                filmGenres.put(filmId, new ArrayList<>());
+            }
+            List<Genre> genres = filmGenres.get(filmId);
+            genres.add(genre);
+        }
+
+        for (Film film : films) {
+            List<Genre> genres = filmGenres.get(film.getId());
+            if (genres == null) {
+                continue;
+            }
+            film.getGenres().addAll(genres);
+        }
+
+        return films;
+    }
+
     private Film rsToFilm(SqlRowSet row) {
         return new Film(
                 row.getInt("ID"),
