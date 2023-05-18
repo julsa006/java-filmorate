@@ -1,20 +1,22 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.film.impl;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> films = new HashMap<>();
     private int currentId = 0;
+    @Autowired
+    private InMemoryLikeStorage likeStorage;
+
 
     @Override
     public List<Film> findAll() {
@@ -31,7 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void update(Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("User %s not found", film.getId()));
+            throw new NotFoundException(String.format("Film %s not found", film.getId()));
         }
         films.put(film.getId(), film);
     }
@@ -42,7 +44,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean contains(Integer id) {
-        return films.containsKey(id);
+    public List<Film> getPopular(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparing(f -> likeStorage.getNumberOfLikes(f.getId()), Comparator.reverseOrder()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 }

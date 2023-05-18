@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 
 @Value
 @Builder(toBuilder = true)
+@AllArgsConstructor
 public class User {
 
     Integer id;

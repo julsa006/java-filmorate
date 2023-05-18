@@ -1,11 +1,9 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.user.impl;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.storage.user.FriendshipStorage;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class InMemoryFriendshipStorage implements FriendshipStorage {
@@ -40,8 +38,11 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
         }
     }
 
-    @Override
-    public Set<Integer> getFriends(Integer userId) {
-        return friendship.get(userId);
+    public List<Integer> getFriends(Integer userId) {
+        List<Integer> result = new ArrayList<>();
+        if (friendship.containsKey(userId)) {
+            result.addAll(friendship.get(userId));
+        }
+        return result;
     }
 }

@@ -13,5 +13,5 @@ public interface FilmStorage {
 
     Film get(Integer id);
 
-    boolean contains(Integer id);
+    List<Film> getPopular(int count);
 }

@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,14 +24,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Test
     void testCreateValidationSuccess() throws Exception {
-        assertCreateStatusOk(userRequestBody(null, "login", "name", "email@test.com", "1995-01-01"));
-        assertCreateStatusOk(userRequestBody(null, "login", null, "email@test.com", "1995-01-01"));
+        assertCreateStatusOk(userRequestBody(null, "login-1", "name", "email-1@test.com", "1995-01-01"));
+        assertCreateStatusOk(userRequestBody(null, "login-2", null, "email-2@test.com", "1995-01-01"));
     }
 
     @Test

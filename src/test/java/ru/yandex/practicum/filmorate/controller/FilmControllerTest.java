@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -20,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -84,7 +88,7 @@ class FilmControllerTest {
         if (name != null) props.add(String.format("\"name\": \"%s\"", name));
         if (description != null) props.add(String.format("\"description\": \"%s\"", description));
         if (releaseDate != null) props.add(String.format("\"releaseDate\": \"%s\"", releaseDate));
-
+        props.add(String.format("\"mpa\": %s", "{ \"id\": 1}"));
         return String.format("{%s}", String.join(",", props));
     }
 

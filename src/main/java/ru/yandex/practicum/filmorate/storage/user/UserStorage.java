@@ -13,5 +13,7 @@ public interface UserStorage {
 
     User get(Integer id);
 
-    boolean contains(Integer id);
+    List<User> getFriends(Integer id);
+
+    List<User> getMutualFriends(Integer firstId, Integer secondId);
 }

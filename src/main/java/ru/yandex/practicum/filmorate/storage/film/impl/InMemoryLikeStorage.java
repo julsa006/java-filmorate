@@ -1,7 +1,8 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,6 @@ public class InMemoryLikeStorage implements LikeStorage {
         likes.get(filmId).remove(userId);
     }
 
-    @Override
     public int getNumberOfLikes(Integer filmId) {
         if (!likes.containsKey(filmId)) {
             return 0;

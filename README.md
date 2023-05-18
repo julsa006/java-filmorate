@@ -1,2 +1,2 @@
 # java-filmorate
-Template repository for Filmorate project.
+![Alt text](ERDiagram.jpg?raw=true "ERDiagram")
