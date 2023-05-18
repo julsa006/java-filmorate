@@ -68,7 +68,7 @@ public class FilmStorageTest {
         assertThat(films).hasSize(2).contains(film1, film2);
     }
 
-    Film createFilm(int i) {
+    private Film createFilm(int i) {
         Film film = new Film(1, "film" + i, "description" + i,
                 LocalDate.of(1990, 12, 31).plusDays(i),
                 i, new ArrayList<>(), new MPA(1, "G"));

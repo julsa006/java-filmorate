@@ -65,7 +65,7 @@ public class UserStorageTest {
         assertThat(users).hasSize(2).contains(user1, user2);
     }
 
-    User createUser(int i) {
+    private User createUser(int i) {
         User user = new User(1, "email" + i + "@email.com", "login" + i, "name" + i,
                 LocalDate.of(1990, 12, 31).plusDays(i));
         return user.toBuilder().id(null).build();

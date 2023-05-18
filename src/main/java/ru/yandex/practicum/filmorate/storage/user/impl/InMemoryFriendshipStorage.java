@@ -39,7 +39,7 @@ public class InMemoryFriendshipStorage implements FriendshipStorage {
     }
 
     public List<Integer> getFriends(Integer userId) {
-        ArrayList<Integer> result = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
         if (friendship.containsKey(userId)) {
             result.addAll(friendship.get(userId));
         }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,11 +123,26 @@ public class FilmDbStorage implements FilmStorage {
 
         String insertSql = "MERGE INTO films_genres (film_id, genre_id) VALUES (?, ?)";
 
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                jdbcTemplate.update(insertSql, film.getId(), genre.getId());
-            }
+        if (film.getGenres() == null) {
+            return;
         }
+        List<Genre> genres = film.getGenres();
+
+        jdbcTemplate.batchUpdate(
+                insertSql,
+                new BatchPreparedStatementSetter() {
+
+                    public void setValues(PreparedStatement ps, int i)
+                            throws SQLException {
+                        ps.setInt(1, film.getId());
+                        ps.setInt(2, genres.get(i).getId());
+                    }
+
+                    public int getBatchSize() {
+                        return genres.size();
+                    }
+
+                });
     }
 
     @Override
